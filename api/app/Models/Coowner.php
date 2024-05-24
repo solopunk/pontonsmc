@@ -10,6 +10,8 @@ class Coowner extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function boat(): BelongsTo
     {
         return $this->belongsTo(Boat::class);

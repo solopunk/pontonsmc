@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->json('content_json');
             $table->string('content_html');
-            $table->boolean('published');
+            $table->boolean('published')->default(false);
 
 
             $table->timestamps();

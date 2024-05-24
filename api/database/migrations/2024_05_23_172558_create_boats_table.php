@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
             $table->foreignId('homeport_id')->constrained()->restrictOnDelete();
-            $table->foreignId('boat_type')->constrained()->restrictOnDelete();
+            $table->foreignId('boat_type_id')->constrained()->restrictOnDelete();
 
             $table->string('name');
             $table->string('brand');

@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->foreignId('member_id')->constrained()->cascadeOnDelete();
 
-            $table->float('amount');
+            $table->float('amount')->nullable();
 
             $table->timestamps();
         });

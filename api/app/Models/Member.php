@@ -12,6 +12,8 @@ class Member extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function boat(): HasOne
     {
         return $this->hasOne(Boat::class);

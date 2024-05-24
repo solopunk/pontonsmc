@@ -11,10 +11,10 @@ class Boat extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
 
     public function coowner(): HasOne
     {
-
         return $this->hasOne(Coowner::class);
     }
 

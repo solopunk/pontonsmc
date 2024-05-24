@@ -10,6 +10,8 @@ class Contribution extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
