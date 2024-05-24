@@ -27,6 +27,7 @@ class MemberController extends Controller
     {
         $request->validate([
             'type' => ['required', Rule::in(['supporter', 'active', 'committee'])],
+
             'member.email' => 'required|email',
             'member.first' => 'required',
             'member.last' => 'required',
@@ -95,7 +96,72 @@ class MemberController extends Controller
      */
     public function update(Request $request, Member $member)
     {
-        //
+        // update member infos
+        if ($request->filled('member')) {
+            $member->updateQuietly($request->input('member'));
+        }
+
+        if (!$member->member_types()->where('uid', '=', 'supporter')->exists()) {
+            // update boat for != supporter
+            if ($request->filled('boat')) {
+                $member->boat->updateQuietly($request->input('boat'));
+            }
+
+            // update or create coowner
+            if ($request->filled('coowner')) {
+                $member->boat->coowner()->updateOrCreate($request->input('coowner'));
+            }
+
+            if (boolval($request->input('delete-coowner'))) {
+                $member->boat->coowner()->delete();
+            }
+        }
+
+        if ($request->filled('type')) {
+            $pastType = $member->member_types()->where('uid', '!=', 'latecomer')->first();
+
+            // from supporter to ...
+            if ($pastType->uid === 'supporter') {
+                $request->validate([
+                    'type' => Rule::in(['active', 'committee']),
+
+                    'boat.name' => 'required',
+                    'boat.brand' => 'required',
+                    'boat.model' => 'required',
+                    'boat.year' => 'required',
+                    'boat.length' => 'required',
+                    'boat.width' => 'required',
+                    'boat.type' => 'required',
+                    'boat.homeport' => 'required',
+                ]);
+
+                $boat = $member->boat()->createQuietly([
+                    'name' => $request->input('boat.name'),
+                    'brand' => $request->input('boat.brand'),
+                    'model' => $request->input('boat.model'),
+                    'year' => $request->input('boat.year'),
+                    'length' => $request->input('boat.length'),
+                    'width' => $request->input('boat.width'),
+                    'boat_type_id' => BoatType::where('uid', $request->input('boat.type'))->pluck('id')->first(),
+                    'homeport_id' => Homeport::where('uid', $request->input('boat.homeport'))->pluck('id')->first()
+                ]);
+
+                if ($request->filled('coowner')) {
+                    $boat->coowner()->createQuietly($request->input('coowner'));
+                }
+            } else {
+                if ($request->input('type') === 'supporter') {
+                    $member->boat()->delete();
+                }
+            }
+
+            // detach past type
+            $member->member_types()->detach($pastType->id);
+
+            // attach new type
+            $type = MemberType::where('uid', $request->input('type'))->pluck('id');
+            $member->member_types()->attach($type);
+        }
     }
 
     /**
@@ -105,4 +171,9 @@ class MemberController extends Controller
     {
         //
     }
+
+    // public function deleteCoowner(Member $member)
+    // {
+    //     $member->boat()->coowner()->delete();
+    // }
 }
