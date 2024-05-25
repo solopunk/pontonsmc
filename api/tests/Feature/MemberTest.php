@@ -37,11 +37,7 @@ class MemberTest extends TestCase
             'member_id' => 1,
             'member_type_id' => 1
         ]);
-        $this->assertDatabaseCount('contributions', 1);
-        $this->assertDatabaseHas('contributions', [
-            'member_id' => 1,
-            'amount' => null
-        ]);
+        $this->assertDatabaseCount('contributions', 0);
     }
 
     public function test_create_active(): void
@@ -75,7 +71,7 @@ class MemberTest extends TestCase
 
         $this->assertDatabaseCount('members', 1);
         $this->assertDatabaseCount('member_member_type', 1);
-        $this->assertDatabaseCount('contributions', 1);
+        $this->assertDatabaseCount('contributions', 0);
         $this->assertDatabaseHas('member_member_type', [
             'member_id' => 1,
             'member_type_id' => 2
@@ -119,7 +115,7 @@ class MemberTest extends TestCase
 
         $this->assertDatabaseCount('members', 1);
         $this->assertDatabaseCount('member_member_type', 1);
-        $this->assertDatabaseCount('contributions', 1);
+        $this->assertDatabaseCount('contributions', 0);
         $this->assertDatabaseHas('member_member_type', [
             'member_id' => 1,
             'member_type_id' => 3
@@ -166,38 +162,6 @@ class MemberTest extends TestCase
         ]);
     }
 
-    public function test_contribution_null_fallback(): void
-    {
-        $this->seed();
-
-        $this->post('api/member', [
-            'type' => 'supporter',
-            'member' => [
-                'email' => fake()->email(),
-                'first' => fake()->firstName(),
-                'last' => fake()->lastName(),
-                'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
-            ],
-        ]);
-
-        $this->assertDatabaseCount('members', 1);
-        $this->assertDatabaseCount('member_member_type', 1);
-        $this->assertDatabaseHas('member_member_type', [
-            'member_id' => 1,
-            'member_type_id' => 1
-        ]);
-        $this->assertDatabaseCount('contributions', 1);
-        $this->assertDatabaseHas('contributions', [
-            'member_id' => 1,
-            'amount' => null
-        ]);
-    }
-
     public function test_w_coowner(): void
     {
         $this->seed();
@@ -234,7 +198,7 @@ class MemberTest extends TestCase
 
         $this->assertDatabaseCount('members', 1);
         $this->assertDatabaseCount('member_member_type', 1);
-        $this->assertDatabaseCount('contributions', 1);
+        $this->assertDatabaseCount('contributions', 0);
         $this->assertDatabaseCount('boats', 1);
         $this->assertDatabaseCount('coowners', 1);
     }
@@ -281,7 +245,7 @@ class MemberTest extends TestCase
         ]);
     }
 
-    public function test_patch_boat(): void
+    public function test_patch_infos_and_boat(): void
     {
         $this->seed();
 
@@ -510,7 +474,6 @@ class MemberTest extends TestCase
         ]);
     }
 
-
     public function test_active_add_coowner(): void
     {
         $this->seed();
@@ -714,5 +677,240 @@ class MemberTest extends TestCase
             'member_id' => 1,
             'member_type_id' => 1
         ]);
+    }
+
+    public function test_add_contribution(): void
+    {
+        $this->seed();
+
+        $this->post('api/member', [
+            'type' => 'supporter',
+            'member' => [
+                'email' => fake()->email(),
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->address(),
+                'postal_code' => fake()->postcode(),
+                'city' => fake()->city(),
+                'phone' => fake()->phoneNumber(),
+                'job' => fake()->jobTitle()
+            ],
+        ]);
+
+        $this->assertDatabaseCount('contributions', 0);
+
+        $this->patch('api/member/1', [
+            'contribution' => 80
+        ]);
+
+        $this->assertDatabaseHas('contributions', [
+            'member_id' => 1,
+            'amount' => 80
+        ]);
+    }
+
+    public function test_update_contribution(): void
+    {
+        $this->seed();
+
+        $this->post('api/member', [
+            'type' => 'supporter',
+            'member' => [
+                'email' => fake()->email(),
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->address(),
+                'postal_code' => fake()->postcode(),
+                'city' => fake()->city(),
+                'phone' => fake()->phoneNumber(),
+                'job' => fake()->jobTitle()
+            ],
+            'contribution' => 80
+        ]);
+
+        $this->assertDatabaseCount('contributions', 1);
+        $this->assertDatabaseHas('contributions', [
+            'member_id' => 1,
+            'amount' => 80,
+            'created_at' => now()
+        ]);
+
+        $this->patch('api/member/1', [
+            'contribution' => 180
+        ]);
+
+        $this->assertDatabaseCount('contributions', 1);
+        $this->assertDatabaseHas('contributions', [
+            'member_id' => 1,
+            'amount' => 180,
+            'created_at' => now()
+        ]);
+    }
+
+    public function test_new_year_add_null_contribution_if_there_was_none(): void
+    {
+        // $this->seed();
+
+        // $this->post('api/member', [
+        //     'type' => 'supporter',
+        //     'member' => [
+        //         'email' => fake()->email(),
+        //         'first' => fake()->firstName(),
+        //         'last' => fake()->lastName(),
+        //         'birthdate' => fake()->date(),
+        //         'address' => fake()->address(),
+        //         'postal_code' => fake()->postcode(),
+        //         'city' => fake()->city(),
+        //         'phone' => fake()->phoneNumber(),
+        //         'job' => fake()->jobTitle()
+        //     ],
+        // ]);
+
+        // $this->assertDatabaseCount('contributions', 0);
+
+        // $this->travel(1)->year();
+
+        // $this->assertDatabaseHas('contributions', [
+        //     'member_id' => 1,
+        //     'amount' => null,
+        //     'created_at' => now()->subYear()
+        // ]);
+    }
+
+    public function test_delete_supporter(): void
+    {
+        $this->seed();
+
+        $this->post('api/member', [
+            'type' => 'supporter',
+            'member' => [
+                'email' => fake()->email(),
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->address(),
+                'postal_code' => fake()->postcode(),
+                'city' => fake()->city(),
+                'phone' => fake()->phoneNumber(),
+                'job' => fake()->jobTitle()
+            ],
+        ]);
+
+        $this->assertDatabaseCount('members', 1);
+        $this->assertDatabaseCount('member_member_type', 1);
+
+        $this->delete('api/member/1');
+
+        $this->assertDatabaseCount('members', 0);
+        $this->assertDatabaseCount('member_member_type', 0);
+    }
+
+    public function test_delete_active_w_coowner(): void
+    {
+        $this->seed();
+
+        $this->post('api/member', [
+            'type' => 'active',
+            'member' => [
+                'email' => fake()->email(),
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->address(),
+                'postal_code' => fake()->postcode(),
+                'city' => fake()->city(),
+                'phone' => fake()->phoneNumber(),
+                'job' => fake()->jobTitle()
+            ],
+            'boat' => [
+                'name' => fake()->word(),
+                'brand' => fake()->word(),
+                'model' => fake()->word(),
+                'year' => fake()->date(),
+                'length' => fake()->randomFloat(),
+                'width' => fake()->randomFloat(),
+                'type' => 'sail',
+                'homeport' => 'fontvieille'
+            ],
+            'coowner' => [
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'nationality' => fake()->word()
+            ]
+        ]);
+
+        $this->assertDatabaseCount('members', 1);
+        $this->assertDatabaseCount('member_member_type', 1);
+        $this->assertDatabaseCount('boats', 1);
+        $this->assertDatabaseCount('coowners', 1);
+        $this->assertDatabaseCount('homeports', 3);
+        $this->assertDatabaseCount('boat_types', 2);
+
+        $this->delete('api/member/1');
+
+        $this->assertDatabaseCount('members', 0);
+        $this->assertDatabaseCount('member_member_type', 0);
+        $this->assertDatabaseCount('boats', 0);
+        $this->assertDatabaseCount('coowners', 0);
+        $this->assertDatabaseCount('homeports', 3);
+        $this->assertDatabaseCount('boat_types', 2);
+    }
+
+    public function test_delete_committee_w_coowner_and_contribution(): void
+    {
+        $this->seed();
+
+        $this->post('api/member', [
+            'type' => 'committee',
+            'member' => [
+                'email' => fake()->email(),
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->address(),
+                'postal_code' => fake()->postcode(),
+                'city' => fake()->city(),
+                'phone' => fake()->phoneNumber(),
+                'job' => fake()->jobTitle()
+            ],
+            'boat' => [
+                'name' => fake()->word(),
+                'brand' => fake()->word(),
+                'model' => fake()->word(),
+                'year' => fake()->date(),
+                'length' => fake()->randomFloat(),
+                'width' => fake()->randomFloat(),
+                'type' => 'sail',
+                'homeport' => 'fontvieille'
+            ],
+            'coowner' => [
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'nationality' => fake()->word()
+            ],
+            'contribution' => 80
+        ]);
+
+        $this->assertDatabaseCount('members', 1);
+        $this->assertDatabaseCount('member_member_type', 1);
+        $this->assertDatabaseCount('boats', 1);
+        $this->assertDatabaseCount('coowners', 1);
+        $this->assertDatabaseCount('contributions', 1);
+
+        $this->assertDatabaseCount('homeports', 3);
+        $this->assertDatabaseCount('boat_types', 2);
+
+        $this->delete('api/member/1');
+
+        $this->assertDatabaseCount('members', 0);
+        $this->assertDatabaseCount('member_member_type', 0);
+        $this->assertDatabaseCount('boats', 0);
+        $this->assertDatabaseCount('coowners', 0);
+        $this->assertDatabaseCount('contributions', 0);
+
+        $this->assertDatabaseCount('homeports', 3);
+        $this->assertDatabaseCount('boat_types', 2);
     }
 }

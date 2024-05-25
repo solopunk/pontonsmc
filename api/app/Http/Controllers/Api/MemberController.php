@@ -59,9 +59,13 @@ class MemberController extends Controller
         $member->member_types()->attach($type);
 
         // contribution
-        $member->contributions()->createQuietly(
-            $request->filled('contribution') ? ['amount' => $request->input('contribution')] : []
-        );
+        if ($request->filled('contribution')) {
+            $request->validate([
+                'contribution' => 'numeric|gt:0',
+            ]);
+
+            $member->contributions()->createQuietly(['amount' => $request->input('contribution')]);
+        }
 
         // boat
         if ($request->input('type') !== 'supporter') {
@@ -78,6 +82,12 @@ class MemberController extends Controller
 
             // coowner
             if ($request->filled('coowner')) {
+                $request->validate([
+                    'coowner.first' => 'required',
+                    'coowner.last' => 'required',
+                    'coowner.nationality' => 'required',
+                ]);
+
                 $boat->coowner()->createQuietly($request->input('coowner'));
             }
         }
@@ -101,6 +111,18 @@ class MemberController extends Controller
             $member->updateQuietly($request->input('member'));
         }
 
+        // add or update contribution
+        if ($request->filled('contribution')) {
+            $request->validate([
+                'contribution' => 'numeric|gt:0',
+            ]);
+
+            $member
+                ->contributions()
+                ->whereDate('created_at', date('Y-m-d'))
+                ->updateOrCreate([], ['amount' => $request->input('contribution')]);
+        }
+
         if (!$member->member_types()->where('uid', '=', 'supporter')->exists()) {
             // update boat for != supporter
             if ($request->filled('boat')) {
@@ -109,7 +131,16 @@ class MemberController extends Controller
 
             // update or create coowner
             if ($request->filled('coowner')) {
-                $member->boat->coowner()->updateOrCreate($request->input('coowner'));
+                if ($member->boat->coowner()->exists()) {
+                    $member->boat->coowner()->update($request->input('coowner'));
+                } else {
+                    $request->validate([
+                        'coowner.first' => 'required',
+                        'coowner.last' => 'required',
+                        'coowner.nationality' => 'required',
+                    ]);
+                    $member->boat->coowner()->createQuietly($request->input('coowner'));
+                }
             }
 
             if (boolval($request->input('delete-coowner'))) {
@@ -117,6 +148,7 @@ class MemberController extends Controller
             }
         }
 
+        // change type
         if ($request->filled('type')) {
             $pastType = $member->member_types()->where('uid', '!=', 'latecomer')->first();
 
@@ -147,9 +179,16 @@ class MemberController extends Controller
                 ]);
 
                 if ($request->filled('coowner')) {
+                    $request->validate([
+                        'coowner.first' => 'required',
+                        'coowner.last' => 'required',
+                        'coowner.nationality' => 'required',
+                    ]);
+
                     $boat->coowner()->createQuietly($request->input('coowner'));
                 }
             } else {
+                // from ... to supporter
                 if ($request->input('type') === 'supporter') {
                     $member->boat()->delete();
                 }
@@ -169,11 +208,6 @@ class MemberController extends Controller
      */
     public function destroy(Member $member)
     {
-        //
+        $member->delete();
     }
-
-    // public function deleteCoowner(Member $member)
-    // {
-    //     $member->boat()->coowner()->delete();
-    // }
 }

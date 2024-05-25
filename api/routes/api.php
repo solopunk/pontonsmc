@@ -9,4 +9,3 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::apiResource('member', MemberController::class);
-// Route::delete('member/{member}/delete-coowner', [MemberController::class, 'deleteCoowner']);

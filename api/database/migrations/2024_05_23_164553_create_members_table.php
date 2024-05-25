@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('city');
             $table->string('phone');
             $table->string('job');
+            $table->boolean('pending')->default(false);
 
             $table->timestamps();
         });
