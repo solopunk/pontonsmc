@@ -21,7 +21,7 @@ return new class extends Migration
             $table->json('content_json');
             $table->string('content_html');
             $table->json('to');
-            $table->boolean('sended');
+            $table->boolean('sent');
             $table->boolean('sheet');
 
             $table->timestamps();
