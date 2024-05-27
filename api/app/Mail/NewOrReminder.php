@@ -4,9 +4,9 @@ namespace App\Mail;
 
 use App\Models\Mail;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -51,8 +51,15 @@ class NewOrReminder extends Mailable
      */
     public function attachments(): array
     {
-        return [
-            ...$this->mail->getMedia('attachments')
+
+        $attachments = [
+            ...$this->mail->getMedia('attachments'),
         ];
+
+        if ($this->mail->sheet) {
+            $attachments[] = Attachment::fromPath(storage_path('app/public/sheet.pdf'));
+        }
+
+        return $attachments;
     }
 }

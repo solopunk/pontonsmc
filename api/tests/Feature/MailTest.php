@@ -496,6 +496,53 @@ class MailTest extends TestCase
         $this->assertDatabaseHas('mails', [
             'sent' => true
         ]);
+    }
 
+    public function test_send_emai_w_sheet(): void
+    {
+        $this->seed();
+        FacadesMail::fake();
+
+        $supporterMail = 'ex@gmail.org';
+
+        $this->post('api/member', [
+            'type' => 'supporter',
+            'member' => [
+                'email' => $supporterMail,
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->address(),
+                'postal_code' => fake()->postcode(),
+                'city' => fake()->city(),
+                'phone' => fake()->phoneNumber(),
+                'job' => fake()->jobTitle()
+            ]
+        ]);
+
+        $this->assertDatabaseCount('members', 1);
+
+        $this->post('api/mail', [
+            'type' => 'new',
+            'title' => fake()->sentence(),
+            'to' => ['supporter'],
+            'sheet' => true
+        ]);
+
+        $resp = $this->get('api/mail/1/send');
+        $resp->assertOk();
+
+        FacadesMail::assertSent(NewOrReminder::class, function (NewOrReminder $mail) use ($supporterMail) {
+            return
+                $mail->hasFrom('flobono@me.com') &&
+                $mail->hasTo($supporterMail) &&
+                $mail->hasAttachment(
+                    Attachment::fromPath(storage_path('app/public/sheet.pdf'))
+                );
+        });
+
+        $this->assertDatabaseHas('mails', [
+            'sent' => true
+        ]);
     }
 }
