@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Admin;
 use App\Models\BoatType;
 use App\Models\Homeport;
+use App\Models\MailType;
 use App\Models\MemberType;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -88,5 +89,21 @@ class DatabaseSeeder extends Seeder
                 'uid' => $type['uid']
             ]);
         }
+
+        foreach ([
+            [
+                'name' => 'Nouvelle',
+                'uid' => 'new'
+            ],
+            [
+                'name' => 'Relance',
+                'uid' => 'reminder'
+            ],
+        ] as $type) {
+            MailType::create([
+                'name' => $type['name'],
+                'uid' => $type['uid']
+            ]);
+        };
     }
 }

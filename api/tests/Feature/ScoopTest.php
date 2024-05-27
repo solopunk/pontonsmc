@@ -135,6 +135,7 @@ class ScoopTest extends TestCase
             'content' => $newJson
         ]);
 
+        $this->assertDatabaseCount('scoops', 1);
         $this->assertDatabaseHas('scoops', [
             'title' => 'new',
             'content_json' => $newJson,

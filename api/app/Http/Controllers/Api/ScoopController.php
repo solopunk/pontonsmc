@@ -25,7 +25,10 @@ class ScoopController extends Controller
         $request->validate([
             'title' => 'required',
             'content' => 'json',
-            'cover' => 'image'
+
+            'cover' => 'image',
+            'attachments' => 'array',
+            'attachments.*' => 'file',
         ]);
 
         $scoop = new Scoop;
@@ -68,7 +71,14 @@ class ScoopController extends Controller
     public function update(Request $request, Scoop $scoop)
     {
         if (boolval(count($request->all()))) {
-            $scoop = new Scoop;
+            $request->validate([
+                'title' => 'sometimes|required',
+                'content' => 'json',
+
+                'cover' => 'image',
+                'attachments' => 'array',
+                'attachments.*' => 'file',
+            ]);
 
             if ($request->filled('title')) {
                 $scoop->title = $request->input('title');
