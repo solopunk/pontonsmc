@@ -301,7 +301,7 @@ class MailTest extends TestCase
 
         $this->assertDatabaseHas('mails', [
             'mail_type_id' => 2,
-            'to' => json_encode(['members' => 'latecomer']),
+            'to' => json_encode(['members' => ['latecomer']]),
         ]);
 
         $this->patch('api/mail/1', [
@@ -428,9 +428,9 @@ class MailTest extends TestCase
                 'birthdate' => fake()->date(),
                 'address' => fake()->address(),
                 'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
+                'city' => fake()->word(),
                 'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'job' => fake()->word()
             ]
         ]);
 
@@ -443,9 +443,9 @@ class MailTest extends TestCase
                 'birthdate' => fake()->date(),
                 'address' => fake()->address(),
                 'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
+                'city' => fake()->word(),
                 'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'job' => fake()->word()
             ]
         ]);
 
@@ -458,17 +458,17 @@ class MailTest extends TestCase
                 'birthdate' => fake()->date(),
                 'address' => fake()->address(),
                 'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
+                'city' => fake()->word(),
                 'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2),
+                'width' => fake()->randomFloat(2),
                 'type' => 'engine',
                 'homeport' => 'hercule'
             ]
@@ -476,21 +476,23 @@ class MailTest extends TestCase
 
         $this->assertDatabaseCount('members', 3);
 
+        $mailTitle = fake()->sentence();
         $this->post('api/mail', [
             'type' => 'new',
-            'title' => fake()->sentence(),
+            'title' => $mailTitle,
             'to' => ['supporter', 'active'],
         ]);
 
         $resp = $this->get('api/mail/1/send');
         $resp->assertOk();
 
-        FacadesMail::assertSent(NewOrReminder::class, function (NewOrReminder $mail) use ($supporterMail, $supporterMail2, $activeMail) {
+        FacadesMail::assertSent(NewOrReminder::class, function (NewOrReminder $mail) use ($supporterMail, $supporterMail2, $activeMail, $mailTitle) {
             return
                 $mail->hasFrom('flobono@me.com') &&
                 $mail->hasTo($supporterMail) &&
                 $mail->hasTo($supporterMail2) &&
-                $mail->hasTo($activeMail);
+                $mail->hasTo($activeMail) &&
+                $mail->hasSubject($mailTitle);
         });
 
         $this->assertDatabaseHas('mails', [
@@ -514,9 +516,9 @@ class MailTest extends TestCase
                 'birthdate' => fake()->date(),
                 'address' => fake()->address(),
                 'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
+                'city' => fake()->word(),
                 'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'job' => fake()->word()
             ]
         ]);
 

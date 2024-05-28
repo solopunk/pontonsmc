@@ -23,7 +23,7 @@ class ScoopController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|string',
             'content' => 'json',
 
             'cover' => 'image',
@@ -72,7 +72,7 @@ class ScoopController extends Controller
     {
         if (boolval(count($request->all()))) {
             $request->validate([
-                'title' => 'sometimes|required',
+                'title' => 'sometimes|required|string',
                 'content' => 'json',
 
                 'cover' => 'image',

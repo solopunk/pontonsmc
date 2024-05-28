@@ -30,7 +30,7 @@ class NewOrReminder extends Mailable
     {
         return new Envelope(
             from: new Address('flobono@me.com', 'Franck Lobono'),
-            subject: 'New Or Reminder',
+            subject: $this->mail->title,
         );
     }
 

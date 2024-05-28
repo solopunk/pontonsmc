@@ -26,30 +26,32 @@ class MemberController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'type' => ['required', Rule::in(['supporter', 'active', 'committee'])],
+            'type' => ['required', 'string', Rule::in(['supporter', 'active', 'committee'])],
 
             'member.email' => 'required|email',
-            'member.first' => 'required',
-            'member.last' => 'required',
-            'member.birthdate' => 'required',
-            'member.address' => 'required',
-            'member.postal_code' => 'required',
-            'member.city' => 'required',
-            'member.phone' => 'required',
-            'member.job' => 'required',
+            'member.first' => 'required|string',
+            'member.last' => 'required|string',
+            'member.birthdate' => 'required|string',
+            'member.address' => 'required|string',
+            'member.postal_code' => 'required|string',
+            'member.city' => 'required|string',
+            'member.phone' => 'required|string',
+            'member.job' => 'required|string',
 
-            'boat.name' => 'required_if:type,active,committee',
-            'boat.brand' => 'required_if:type,active,committee',
-            'boat.model' => 'required_if:type,active,committee',
-            'boat.year' => 'required_if:type,active,committee',
-            'boat.length' => 'required_if:type,active,committee',
-            'boat.width' => 'required_if:type,active,committee',
-            'boat.type' => 'required_if:type,active,committee',
-            'boat.homeport' => 'required_if:type,active,committee',
+            'boat.name' => 'required_if:type,active,committee|string',
+            'boat.brand' => 'required_if:type,active,committee|string',
+            'boat.model' => 'required_if:type,active,committee|string',
+            'boat.year' => 'required_if:type,active,committee|date',
+            'boat.length' => 'required_if:type,active,committee|decimal:0,2',
+            'boat.width' => 'required_if:type,active,committee|decimal:0,2',
+            'boat.type' => 'required_if:type,active,committee|string',
+            'boat.homeport' => 'required_if:type,active,committee|string',
 
-            'coowner.first' => 'prohibited_if:type,supporter',
-            'coowner.last' => 'prohibited_if:type,supporter',
-            'coowner.nationality' => 'prohibited_if:type,supporter',
+            'coowner.first' => 'prohibited_if:type,supporter|string',
+            'coowner.last' => 'prohibited_if:type,supporter|string',
+            'coowner.nationality' => 'prohibited_if:type,supporter|string',
+
+            'contribution' => 'numeric|gt:0',
         ]);
 
         $member = Member::create($request->input('member'));
@@ -60,10 +62,6 @@ class MemberController extends Controller
 
         // contribution
         if ($request->filled('contribution')) {
-            $request->validate([
-                'contribution' => 'numeric|gt:0',
-            ]);
-
             $member->contributions()->createQuietly(['amount' => $request->input('contribution')]);
         }
 
@@ -82,12 +80,6 @@ class MemberController extends Controller
 
             // coowner
             if ($request->filled('coowner')) {
-                $request->validate([
-                    'coowner.first' => 'required',
-                    'coowner.last' => 'required',
-                    'coowner.nationality' => 'required',
-                ]);
-
                 $boat->coowner()->createQuietly($request->input('coowner'));
             }
         }
@@ -106,6 +98,35 @@ class MemberController extends Controller
      */
     public function update(Request $request, Member $member)
     {
+        $request->validate([
+            'type' => 'string',
+
+            'member.email' => 'email',
+            'member.first' => 'string',
+            'member.last' => 'string',
+            'member.birthdate' => 'string',
+            'member.address' => 'string',
+            'member.postal_code' => 'string',
+            'member.city' => 'string',
+            'member.phone' => 'string',
+            'member.job' => 'string',
+
+            'boat.name' => 'string',
+            'boat.brand' => 'string',
+            'boat.model' => 'string',
+            'boat.year' => 'date',
+            'boat.length' => 'decimal:0,2',
+            'boat.width' => 'decimal:0,2',
+            'boat.type' => 'string',
+            'boat.homeport' => 'string',
+
+            'coowner.first' => 'string',
+            'coowner.last' => 'string',
+            'coowner.nationality' => 'string',
+
+            'contribution' => 'numeric|gt:0',
+        ]);
+
         // update member infos
         if ($request->filled('member')) {
             $member->updateQuietly($request->input('member'));
@@ -113,10 +134,6 @@ class MemberController extends Controller
 
         // add or update contribution
         if ($request->filled('contribution')) {
-            $request->validate([
-                'contribution' => 'numeric|gt:0',
-            ]);
-
             $member
                 ->contributions()
                 ->whereDate('created_at', date('Y-m-d'))
@@ -135,9 +152,9 @@ class MemberController extends Controller
                     $member->boat->coowner()->update($request->input('coowner'));
                 } else {
                     $request->validate([
-                        'coowner.first' => 'required',
-                        'coowner.last' => 'required',
-                        'coowner.nationality' => 'required',
+                        'coowner.first' => 'required|string',
+                        'coowner.last' => 'required|string',
+                        'coowner.nationality' => 'required|string',
                     ]);
                     $member->boat->coowner()->createQuietly($request->input('coowner'));
                 }
@@ -155,16 +172,16 @@ class MemberController extends Controller
             // from supporter to ...
             if ($pastType->uid === 'supporter') {
                 $request->validate([
-                    'type' => Rule::in(['active', 'committee']),
+                    'type' => ['string', Rule::in(['active', 'committee'])],
 
-                    'boat.name' => 'required',
-                    'boat.brand' => 'required',
-                    'boat.model' => 'required',
-                    'boat.year' => 'required',
-                    'boat.length' => 'required',
-                    'boat.width' => 'required',
-                    'boat.type' => 'required',
-                    'boat.homeport' => 'required',
+                    'boat.name' => 'required|string',
+                    'boat.brand' => 'required|string',
+                    'boat.model' => 'required|string',
+                    'boat.year' => 'required|date',
+                    'boat.length' => 'required|decimal:0,2',
+                    'boat.width' => 'required|decimal:0,2',
+                    'boat.type' => 'required|string',
+                    'boat.homeport' => 'required|string',
                 ]);
 
                 $boat = $member->boat()->createQuietly([
@@ -180,9 +197,9 @@ class MemberController extends Controller
 
                 if ($request->filled('coowner')) {
                     $request->validate([
-                        'coowner.first' => 'required',
-                        'coowner.last' => 'required',
-                        'coowner.nationality' => 'required',
+                        'coowner.first' => 'required|string',
+                        'coowner.last' => 'required|string',
+                        'coowner.nationality' => 'required|string',
                     ]);
 
                     $boat->coowner()->createQuietly($request->input('coowner'));

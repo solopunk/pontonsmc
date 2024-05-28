@@ -23,11 +23,11 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ]
         ]);
 
@@ -51,19 +51,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'engine',
                 'homeport' => 'hercule'
             ]
@@ -95,19 +95,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ]
@@ -140,11 +140,11 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'contribution' => $contribution
         ]);
@@ -173,19 +173,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -207,9 +207,9 @@ class MemberTest extends TestCase
     {
         $this->seed();
 
-        $city = fake()->city();
-        $phone = fake()->phoneNumber();
-        $job = fake()->jobTitle();
+        $city = fake()->word();
+        $phone = fake()->word();
+        $job = fake()->word();
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -218,16 +218,16 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
                 'city' => $city,
                 'phone' => $phone,
                 'job' => $job
             ],
         ]);
 
-        $newFirstname = fake()->firstName();
-        $newLastname = fake()->lastName();
+        $newFirstname = fake()->word();
+        $newLastname = fake()->word();
 
         $this->patch('api/member/1', [
             'member' => [
@@ -256,19 +256,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -279,8 +279,8 @@ class MemberTest extends TestCase
             ]
         ]);
 
-        $newFirstname = fake()->firstName();
-        $newLastname = fake()->lastName();
+        $newFirstname = fake()->word();
+        $newLastname = fake()->word();
         $newBoatName = fake()->word();
         $newBoatBrand = fake()->word();
 
@@ -309,9 +309,9 @@ class MemberTest extends TestCase
     {
         $this->seed();
 
-        $city = fake()->city();
-        $phone = fake()->phoneNumber();
-        $job = fake()->jobTitle();
+        $city = fake()->word();
+        $phone = fake()->word();
+        $job = fake()->word();
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -320,16 +320,16 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
                 'city' => $city,
                 'phone' => $phone,
                 'job' => $job
             ],
         ]);
 
-        $newFirstname = fake()->firstName();
-        $newLastname = fake()->lastName();
+        $newFirstname = fake()->word();
+        $newLastname = fake()->word();
 
         $this->patch('api/member/1', [
             'type' => 'active',
@@ -342,8 +342,8 @@ class MemberTest extends TestCase
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -368,9 +368,9 @@ class MemberTest extends TestCase
     {
         $this->seed();
 
-        $city = fake()->city();
-        $phone = fake()->phoneNumber();
-        $job = fake()->jobTitle();
+        $city = fake()->word();
+        $phone = fake()->word();
+        $job = fake()->word();
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -379,16 +379,16 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
                 'city' => $city,
                 'phone' => $phone,
                 'job' => $job
             ],
         ]);
 
-        $newFirstname = fake()->firstName();
-        $newLastname = fake()->lastName();
+        $newFirstname = fake()->word();
+        $newLastname = fake()->word();
 
         $this->patch('api/member/1', [
             'type' => 'committee',
@@ -401,8 +401,8 @@ class MemberTest extends TestCase
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -440,19 +440,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -485,19 +485,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -531,19 +531,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -554,8 +554,8 @@ class MemberTest extends TestCase
             ]
         ]);
 
-        $newFirstname = fake()->firstName();
-        $newLastname = fake()->lastName();
+        $newFirstname = fake()->word();
+        $newLastname = fake()->word();
         $newNatio = fake()->word();
 
         $this->patch('api/member/1', [
@@ -590,19 +590,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -639,19 +639,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -690,11 +690,11 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
         ]);
 
@@ -721,11 +721,11 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'contribution' => 80
         ]);
@@ -760,11 +760,11 @@ class MemberTest extends TestCase
         //         'first' => fake()->firstName(),
         //         'last' => fake()->lastName(),
         //         'birthdate' => fake()->date(),
-        //         'address' => fake()->address(),
-        //         'postal_code' => fake()->postcode(),
-        //         'city' => fake()->city(),
-        //         'phone' => fake()->phoneNumber(),
-        //         'job' => fake()->jobTitle()
+        //         'address' => fake()->word(),
+        //         'postal_code' => fake()->word(),
+        //         'city' => fake()->word(),
+        //         'phone' => fake()->word(),
+        //         'job' => fake()->word()
         //     ],
         // ]);
 
@@ -790,11 +790,11 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
         ]);
 
@@ -818,19 +818,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],
@@ -869,19 +869,19 @@ class MemberTest extends TestCase
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
-                'address' => fake()->address(),
-                'postal_code' => fake()->postcode(),
-                'city' => fake()->city(),
-                'phone' => fake()->phoneNumber(),
-                'job' => fake()->jobTitle()
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
             ],
             'boat' => [
                 'name' => fake()->word(),
                 'brand' => fake()->word(),
                 'model' => fake()->word(),
                 'year' => fake()->date(),
-                'length' => fake()->randomFloat(),
-                'width' => fake()->randomFloat(),
+                'length' => fake()->randomFloat(2, 2),
+                'width' => fake()->randomFloat(2, 2),
                 'type' => 'sail',
                 'homeport' => 'fontvieille'
             ],

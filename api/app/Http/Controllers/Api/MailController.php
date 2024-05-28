@@ -30,8 +30,8 @@ class MailController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'type' => ['required', Rule::in(['new', 'reminder'])],
-            'title' => 'required',
+            'type' => ['required', 'string', Rule::in(['new', 'reminder'])],
+            'title' => 'required|string',
             'content' => 'json',
             'to' => ['required_if:type,new', 'array', 'prohibited_if:type,reminder', Rule::in(['supporter', 'active', 'committee'])],
             'sheet' => 'boolean',
@@ -69,7 +69,7 @@ class MailController extends Controller
                 break;
 
             case 'reminder':
-                $mail->to = json_encode(['members' => 'latecomer']);
+                $mail->to = json_encode(['members' => ['latecomer']]);
                 break;
         }
 
@@ -103,8 +103,8 @@ class MailController extends Controller
     {
         if (boolval(count($request->all()))) {
             $request->validate([
-                'type' => ['sometimes', 'required', Rule::in(['new', 'reminder'])],
-                'title' => 'sometimes|required',
+                'type' => ['sometimes', 'required', 'string', Rule::in(['new', 'reminder'])],
+                'title' => 'sometimes|required|string',
                 'content' => 'json',
                 'to' => ['sometimes', 'required', 'required_if:type,new', 'array', 'prohibited_if:type,reminder', Rule::in(['supporter', 'active', 'committee'])],
                 'sheet' => 'boolean',
@@ -142,7 +142,7 @@ class MailController extends Controller
                 $mail->mail_type()->associate($type);
 
                 if ($request->input('type') === 'reminder') {
-                    $mail->to = json_encode(['members' => 'latecomer']);
+                    $mail->to = json_encode(['members' => ['latecomer']]);
                 }
             }
 
@@ -187,11 +187,14 @@ class MailController extends Controller
             $query->whereIn('uid', $typesAggregated);
         })->pluck('email');
 
-        // send mail
-        FacadesMail::to($emails)->send(new NewOrReminder($mail));
+        // if mails retrieved
+        if (boolval($emails->toArray())) {
+            // send mail
+            FacadesMail::to($emails)->send(new NewOrReminder($mail));
 
-        // switch mail to 'sent' mode
-        $mail->sent = true;
-        $mail->saveQuietly();
+            // switch mail to 'sent' mode
+            $mail->sent = true;
+            $mail->saveQuietly();
+        }
     }
 }
