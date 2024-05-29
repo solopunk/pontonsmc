@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Mail\WelcomeMember;
 use App\Models\Admin;
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class MemberTest extends TestCase
@@ -912,5 +914,42 @@ class MemberTest extends TestCase
 
         $this->assertDatabaseCount('homeports', 3);
         $this->assertDatabaseCount('boat_types', 2);
+    }
+
+    public function test_create_supporter_and_send_pw_mail(): void
+    {
+        $this->seed();
+        Mail::fake();
+
+        $memberEmail = fake()->email();
+        $this->post('api/member', [
+            'type' => 'supporter',
+            'member' => [
+                'email' => $memberEmail,
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
+            ],
+            'welcome' => true
+        ]);
+
+        $this->assertDatabaseCount('members', 1);
+        $this->assertDatabaseCount('member_member_type', 1);
+        $this->assertDatabaseHas('member_member_type', [
+            'member_id' => 1,
+            'member_type_id' => 1
+        ]);
+        $this->assertDatabaseCount('contributions', 0);
+
+        Mail::assertSent(WelcomeMember::class, function (WelcomeMember $mail) use ($memberEmail) {
+            return
+                $mail->hasFrom('flobono@me.com') &&
+                $mail->hasTo($memberEmail);
+        });
     }
 }

@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->string('title');
             $table->json('content_json')->nullable();
-            $table->string('content_html')->nullable();
+            $table->text('content_html')->nullable();
             $table->json('to');
             $table->boolean('sent')->default(false);
             $table->boolean('sheet')->default(false);

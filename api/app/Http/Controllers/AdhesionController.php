@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DeclineRequestor;
 use App\Models\BoatType;
 use App\Models\Homeport;
 use App\Models\Member;
 use App\Models\MemberType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class AdhesionController extends Controller
@@ -81,5 +83,7 @@ class AdhesionController extends Controller
     public function declineAdhesion(Member $requestor)
     {
         $requestor->deleteQuietly();
+
+        Mail::to($requestor->email)->send(new DeclineRequestor());
     }
 }

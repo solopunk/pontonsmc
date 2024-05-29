@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Mail\DeclineRequestor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AdhesionTest extends TestCase
@@ -114,11 +116,13 @@ class AdhesionTest extends TestCase
     public function test_decline_adhesion(): void
     {
         $this->seed();
+        Mail::fake();
 
+        $requestorMail = fake()->email();
         $this->post('do/request-adhesion', [
             'type' => 'active',
             'member' => [
-                'email' => fake()->email(),
+                'email' => $requestorMail,
                 'first' => fake()->firstName(),
                 'last' => fake()->lastName(),
                 'birthdate' => fake()->date(),
@@ -158,5 +162,11 @@ class AdhesionTest extends TestCase
         $this->assertDatabaseCount('member_member_type', 0);
         $this->assertDatabaseCount('boats', 0);
         $this->assertDatabaseCount('coowners', 0);
+
+        Mail::assertSent(DeclineRequestor::class, function (DeclineRequestor $mail) use ($requestorMail) {
+            return
+                $mail->hasFrom('flobono@me.com') &&
+                $mail->hasTo($requestorMail);
+        });
     }
 }

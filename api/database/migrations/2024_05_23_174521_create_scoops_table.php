@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->string('title');
             $table->json('content_json')->nullable();
-            $table->string('content_html')->nullable();
+            $table->text('content_html')->nullable();
             $table->boolean('published')->default(false);
 
             $table->timestamps();

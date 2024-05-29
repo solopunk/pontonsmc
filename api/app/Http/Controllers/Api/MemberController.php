@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMember;
 use App\Models\BoatType;
 use App\Models\Homeport;
 use App\Models\Member;
 use App\Models\MemberType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class MemberController extends Controller
@@ -52,6 +54,8 @@ class MemberController extends Controller
             'coowner.nationality' => 'prohibited_if:type,supporter|string',
 
             'contribution' => 'numeric|gt:0',
+
+            'welcome' => 'boolean'
         ]);
 
         $member = Member::create($request->input('member'));
@@ -82,6 +86,11 @@ class MemberController extends Controller
             if ($request->filled('coowner')) {
                 $boat->coowner()->createQuietly($request->input('coowner'));
             }
+        }
+
+        // welcome mail
+        if ($request->filled('welcome')) {
+            Mail::to($member->email)->send(new WelcomeMember());
         }
     }
 
