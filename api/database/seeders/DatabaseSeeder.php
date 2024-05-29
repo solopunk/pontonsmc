@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Admin;
 use App\Models\BoatType;
+use App\Models\Homepage;
 use App\Models\Homeport;
 use App\Models\MailType;
 use App\Models\MemberType;
@@ -28,11 +29,13 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
+        // super
         Admin::create([
             'email' => 'webmaster@media-events.mc',
             'pw' => 'Mediadmin98!'
         ]);
 
+        // member types
         foreach ([
             [
                 'name' => 'Sympathisant',
@@ -57,6 +60,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // boat types
         foreach ([
             [
                 'name' => 'Moteur',
@@ -73,6 +77,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // homeports
         foreach ([
             [
                 'name' => 'Hercule',
@@ -109,6 +114,7 @@ class DatabaseSeeder extends Seeder
             ]);
         };
 
+        // tabs
         foreach ([
             [
                 'title' => 'Objet',
@@ -157,5 +163,21 @@ class DatabaseSeeder extends Seeder
                 'content_html' => $html
             ]);
         };
+
+        // homepage
+        $homepageIntro = 'Cher plaisanciers, Bienvenue sur le site officiel de l\'association des «Pontons de Monaco». Nous nous sommes regroupés par passion pour la mer et par amour de nos ports, Hercule et Fontvieille. Nous aspirons au maintien d\'une plaisance locale dynamique, dans le respect des traditions instaurées par nos Princes. Propriétaires de bateaux de 0 à 18m sous pavillon monégasque, dans un esprit solidaire comme le veut la tradition maritime, dans une démarche constructive, comme l\'impose notre attachement à Monaco, nous vous proposons de rejoindre notre association.';
+
+        $parser = new HtmlParser(
+            "<p class=\"prs-paragraph\">{$homepageIntro}</p>"
+        );
+
+        $introJson = $parser->toBlocks();
+        $introHtml = Parser::parse($json)->toHtml();
+
+        Homepage::create([
+            'title' => 'L\'association de promotion et de maintien  de la petite et moyenne plaisance dans les ports de Monaco',
+            'intro_json' => $introJson,
+            'intro_html' => $introHtml,
+        ]);
     }
 }

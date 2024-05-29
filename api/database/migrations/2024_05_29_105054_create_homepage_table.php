@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('scoops', function (Blueprint $table) {
+        Schema::create('homepage', function (Blueprint $table) {
             $table->id();
 
             $table->string('title');
-            $table->json('content_json')->nullable();
-            $table->string('content_html')->nullable();
-            $table->boolean('published')->default(false);
+            $table->json('intro_json');
+            $table->text('intro_html');
 
             $table->timestamps();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('scoops');
+        Schema::dropIfExists('homepage');
     }
 };
