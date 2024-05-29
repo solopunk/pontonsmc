@@ -21,4 +21,5 @@ Route::apiResource('scoop', ScoopController::class);
 
 Route::get('mail/{mail}/send', [MailController::class, 'send']);
 Route::delete('mail/{mail}/delete-attachment/{attachment}', [MailController::class, 'deleteAttachment']);
+Route::get('mail/{mail}/copy', [MailController::class, 'copy']);
 Route::apiResource('mail', MailController::class);

@@ -547,4 +547,93 @@ class MailTest extends TestCase
             'sent' => true
         ]);
     }
+
+    public function test_mail_duplicate_without_attachments(): void
+    {
+        $this->seed();
+
+        $mail = Mail::create([
+            'mail_type_id' => 1,
+            'title' => fake()->sentence(),
+            'content_json' => json_encode([fake()->word() => fake()->sentence()]),
+            'content_html' => fake()->randomHtml(),
+            'to' => json_encode(['members' => ['supporter', 'committee']]),
+            'sent' => true,
+            'sheet' => false
+        ]);
+
+        $this->assertDatabaseCount('mails', 1);
+
+        $this->get('api/mail/1/copy');
+
+        $this->assertDatabaseCount('mails', 2);
+
+        $this->assertDatabaseHas('mails', [
+            'sent' => false,
+        ]);
+
+        $this->assertDatabaseHas('mails', [
+            'sent' => true
+        ]);
+
+        $this->assertDatabaseHas('mails', [
+            'id' => 2,
+            'mail_type_id' => 1,
+            'to' => json_encode(['members' => ['supporter', 'committee']]),
+            'sent' => false,
+            'sheet' => false
+        ]);
+    }
+
+    public function test_mail_duplicate_w_attachments(): void
+    {
+        $this->seed();
+
+        $mail = Mail::create([
+            'mail_type_id' => 1,
+            'title' => fake()->sentence(),
+            'content_json' => json_encode([fake()->word() => fake()->sentence()]),
+            'content_html' => fake()->randomHtml(),
+            'to' => json_encode(['members' => ['supporter', 'committee']]),
+            'sent' => false,
+            'sheet' => false
+        ]);
+
+        $mediaName1 = 'doc1.pdf';
+        $mediaName2 = 'doc2.pdf';
+        $this->patch('api/mail/1', [
+            'attachments' => [
+                UploadedFile::fake()->create($mediaName1),
+                UploadedFile::fake()->create($mediaName2),
+            ],
+        ]);
+
+        $mail->sent = true;
+        $mail->save();
+
+        $this->assertDatabaseCount('mails', 1);
+        $this->assertDatabaseCount('media', 2);
+
+        $this->get('api/mail/1/copy');
+
+        $this->assertDatabaseCount('mails', 2);
+
+        $this->assertDatabaseHas('mails', [
+            'sent' => false,
+        ]);
+
+        $this->assertDatabaseHas('mails', [
+            'sent' => true
+        ]);
+
+        $this->assertDatabaseHas('mails', [
+            'id' => 2,
+            'mail_type_id' => 1,
+            'to' => json_encode(['members' => ['supporter', 'committee']]),
+            'sent' => false,
+            'sheet' => false
+        ]);
+
+        $this->assertDatabaseCount('media', 4);
+    }
 }

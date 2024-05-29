@@ -101,7 +101,7 @@ class MailController extends Controller
      */
     public function update(Request $request, Mail $mail)
     {
-        if (boolval(count($request->all()))) {
+        if (boolval(count($request->all())) && !boolval($mail->sent)) {
             $request->validate([
                 'type' => ['sometimes', 'required', 'string', Rule::in(['new', 'reminder'])],
                 'title' => 'sometimes|required|string',
@@ -195,6 +195,25 @@ class MailController extends Controller
             // switch mail to 'sent' mode
             $mail->sent = true;
             $mail->saveQuietly();
+        }
+    }
+
+    public function copy(Mail $mail)
+    {
+        if (boolval($mail->sent)) {
+            $copiedMail = $mail->replicate([
+                'sent'
+            ]);
+            $copiedMail->saveQuietly();
+
+            // copy attachments
+            if (boolval($mail->getMedia('attachments')->first())) {
+                $sentMailAttachments = $mail->getMedia('attachments');
+
+                foreach ($sentMailAttachments as $attachment) {
+                    $attachment->copy($copiedMail, 'attachments');
+                }
+            }
         }
     }
 }
