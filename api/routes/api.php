@@ -4,6 +4,7 @@ use App\Http\Controllers\AdhesionController;
 use App\Http\Controllers\Api\MailController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\ScoopController;
+use App\Http\Controllers\Api\TabController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,3 +24,5 @@ Route::get('mail/{mail}/send', [MailController::class, 'send']);
 Route::delete('mail/{mail}/delete-attachment/{attachment}', [MailController::class, 'deleteAttachment']);
 Route::get('mail/{mail}/copy', [MailController::class, 'copy']);
 Route::apiResource('mail', MailController::class);
+
+Route::patch('tab/{tab}', [TabController::class, 'update']);
