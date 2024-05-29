@@ -14,6 +14,7 @@ use Durlecode\EJSParser\HtmlParser;
 use Durlecode\EJSParser\Parser;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -32,7 +33,7 @@ class DatabaseSeeder extends Seeder
         // super
         Admin::create([
             'email' => 'webmaster@media-events.mc',
-            'pw' => 'Mediadmin98!'
+            'password' => Hash::make('Mediadmin98!')
         ]);
 
         // member types

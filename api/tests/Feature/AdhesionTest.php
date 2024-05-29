@@ -3,9 +3,13 @@
 namespace Tests\Feature;
 
 use App\Mail\DeclineRequestor;
+use App\Models\Admin;
+use App\Models\Member;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AdhesionTest extends TestCase
@@ -43,6 +47,7 @@ class AdhesionTest extends TestCase
     public function test_unknown_request_an_adhesion_for_active(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('do/request-adhesion', [
             'type' => 'active',
@@ -86,6 +91,8 @@ class AdhesionTest extends TestCase
     public function test_accept_adhesion(): void
     {
         $this->seed();
+        Notification::fake();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('do/request-adhesion', [
             'type' => 'supporter',
@@ -111,11 +118,14 @@ class AdhesionTest extends TestCase
         $this->assertDatabaseHas('members', [
             'pending' => false
         ]);
+
+        Notification::assertSentTo([Member::find(1)], ResetPassword::class);
     }
 
     public function test_decline_adhesion(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
         Mail::fake();
 
         $requestorMail = fake()->email();

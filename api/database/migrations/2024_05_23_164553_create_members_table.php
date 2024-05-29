@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('email');
-            $table->string('pw')->nullable();
+            $table->string('password')->nullable();
             $table->string('first');
             $table->string('last');
             $table->string('birthdate');

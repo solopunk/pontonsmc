@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\WelcomeMember;
 use App\Models\BoatType;
 use App\Models\Homeport;
 use App\Models\Member;
 use App\Models\MemberType;
+use App\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 
 class MemberController extends Controller
@@ -90,7 +91,7 @@ class MemberController extends Controller
 
         // welcome mail
         if ($request->filled('welcome')) {
-            Mail::to($member->email)->send(new WelcomeMember());
+            Utils::sendPasswordReset($member->email);
         }
     }
 
@@ -226,6 +227,13 @@ class MemberController extends Controller
             // attach new type
             $type = MemberType::where('uid', $request->input('type'))->pluck('id');
             $member->member_types()->attach($type);
+        }
+    }
+
+    public function welcome(Member $member)
+    {
+        if (!boolval($member->password)) {
+            Utils::sendPasswordReset($member->email);
         }
     }
 

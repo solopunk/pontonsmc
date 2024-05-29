@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\NewOrReminder;
+use App\Models\Admin;
 use App\Models\Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -18,6 +19,7 @@ class MailTest extends TestCase
     public function test_create_mail_for_supporters(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $json = json_encode([
             'time' => 1716647560421,
@@ -55,6 +57,7 @@ class MailTest extends TestCase
     public function test_create_mail_for_actives_and_commitee_w_sheet(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $title = fake()->word();
 
@@ -77,6 +80,7 @@ class MailTest extends TestCase
     public function test_mail_fail_when_type_new_and_to_latecomer(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $title = fake()->word();
         $resp = $this->post('api/mail', [
@@ -93,6 +97,7 @@ class MailTest extends TestCase
     public function test_create_mail_w_attachments(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName1 = 'doc1.pdf';
         $mediaName2 = 'doc2.pdf';
@@ -112,6 +117,7 @@ class MailTest extends TestCase
     public function test_delete_attachment(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName1 = 'doc1.pdf';
         $mediaName2 = 'doc2.pdf';
@@ -135,6 +141,7 @@ class MailTest extends TestCase
     public function test_patch_title_and_content_of_mail(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $json = json_encode([
             'time' => 1716647560421,
@@ -202,6 +209,7 @@ class MailTest extends TestCase
     public function test_patch_title_content_and_aggregates_of_mail(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $json = json_encode([
             'time' => 1716647560421,
@@ -270,6 +278,7 @@ class MailTest extends TestCase
     public function test_patch_mail_type_from_new_to_reminder(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/mail', [
             'type' => 'new',
@@ -293,6 +302,7 @@ class MailTest extends TestCase
     public function test_patch_mail_type_from_reminder_to_new(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/mail', [
             'type' => 'reminder',
@@ -319,6 +329,7 @@ class MailTest extends TestCase
     public function test_patch_mail_sheet(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/mail', [
             'type' => 'new',
@@ -342,6 +353,7 @@ class MailTest extends TestCase
     public function test_add_attachments(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/mail', [
             'type' => 'new',
@@ -367,6 +379,7 @@ class MailTest extends TestCase
     public function test_delete_mail_w_attachments(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName1 = 'doc1.pdf';
         $mediaName2 = 'doc2.pdf';
@@ -392,6 +405,7 @@ class MailTest extends TestCase
     public function test_mail_dont_delete_when_sent(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         Mail::create([
             'mail_type_id' => 1,
@@ -413,6 +427,7 @@ class MailTest extends TestCase
     public function test_send_email(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
         FacadesMail::fake();
 
         $supporterMail = 'ex@gmail.org';
@@ -503,6 +518,7 @@ class MailTest extends TestCase
     public function test_send_emai_w_sheet(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
         FacadesMail::fake();
 
         $supporterMail = 'ex@gmail.org';
@@ -551,6 +567,7 @@ class MailTest extends TestCase
     public function test_mail_duplicate_without_attachments(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mail = Mail::create([
             'mail_type_id' => 1,
@@ -588,6 +605,7 @@ class MailTest extends TestCase
     public function test_mail_duplicate_w_attachments(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mail = Mail::create([
             'mail_type_id' => 1,

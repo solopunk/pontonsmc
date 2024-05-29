@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
@@ -14,6 +15,7 @@ class ScoopTest extends TestCase
     public function test_create_scoop(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $json = json_encode([
             'time' => 1716647560421,
@@ -43,6 +45,7 @@ class ScoopTest extends TestCase
     public function test_create_scoop_w_cover(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName = 'avatar.jpg';
         $collectionName = 'covers';
@@ -68,6 +71,7 @@ class ScoopTest extends TestCase
     public function test_create_scoop_w_attachments(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName1 = 'doc1.pdf';
         $mediaName2 = 'doc2.pdf';
@@ -91,6 +95,7 @@ class ScoopTest extends TestCase
     public function test_patch_scoop(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $json = json_encode([
             'time' => 1716647560421,
@@ -146,6 +151,7 @@ class ScoopTest extends TestCase
     public function test_patch_scoop_cover(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName = 'avatar.jpg';
         $collectionName = 'covers';
@@ -189,6 +195,7 @@ class ScoopTest extends TestCase
     public function test_toggle_visibility(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $json = json_encode([
             'time' => 1716647560421,
@@ -219,6 +226,7 @@ class ScoopTest extends TestCase
     public function test_delete_attachment(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $mediaName = 'doc1.pdf';
         $this->post('api/scoop', [
@@ -239,6 +247,7 @@ class ScoopTest extends TestCase
     public function test_delete_scoop(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/scoop', [
             'title' => fake()->word(),

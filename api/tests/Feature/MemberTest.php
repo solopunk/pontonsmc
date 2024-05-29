@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Mail\WelcomeMember;
 use App\Models\Admin;
+use App\Models\Member;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class MemberTest extends TestCase
@@ -17,6 +19,7 @@ class MemberTest extends TestCase
     public function test_create_supporter(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -45,6 +48,7 @@ class MemberTest extends TestCase
     public function test_create_active(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'active',
@@ -89,6 +93,7 @@ class MemberTest extends TestCase
     public function test_create_committee(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'committee',
@@ -133,6 +138,7 @@ class MemberTest extends TestCase
     public function test_w_contribution(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
         $contribution = fake()->numberBetween(10, 100);
 
         $this->post('api/member', [
@@ -167,6 +173,7 @@ class MemberTest extends TestCase
     public function test_w_coowner(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'committee',
@@ -208,6 +215,7 @@ class MemberTest extends TestCase
     public function test_patch_supporter(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $city = fake()->word();
         $phone = fake()->word();
@@ -250,6 +258,7 @@ class MemberTest extends TestCase
     public function test_patch_infos_and_boat(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'committee',
@@ -310,6 +319,7 @@ class MemberTest extends TestCase
     public function test_from_supporter_to_active(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $city = fake()->word();
         $phone = fake()->word();
@@ -369,6 +379,7 @@ class MemberTest extends TestCase
     public function test_from_supporter_to_committee_w_coowner(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $city = fake()->word();
         $phone = fake()->word();
@@ -434,6 +445,7 @@ class MemberTest extends TestCase
     public function test_from_active_to_committee(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'active',
@@ -479,6 +491,7 @@ class MemberTest extends TestCase
     public function test_active_add_coowner(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'active',
@@ -525,6 +538,7 @@ class MemberTest extends TestCase
     public function test_active_patch_coowner(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'active',
@@ -584,6 +598,7 @@ class MemberTest extends TestCase
     public function test_delete_coowner(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'active',
@@ -633,6 +648,7 @@ class MemberTest extends TestCase
     public function test_from_committee_w_coowner_to_supporter(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'committee',
@@ -684,6 +700,7 @@ class MemberTest extends TestCase
     public function test_add_contribution(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -715,6 +732,7 @@ class MemberTest extends TestCase
     public function test_update_contribution(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -784,6 +802,7 @@ class MemberTest extends TestCase
     public function test_delete_supporter(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'supporter',
@@ -812,6 +831,7 @@ class MemberTest extends TestCase
     public function test_delete_active_w_coowner(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'active',
@@ -863,6 +883,7 @@ class MemberTest extends TestCase
     public function test_delete_committee_w_coowner_and_contribution(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $this->post('api/member', [
             'type' => 'committee',
@@ -916,10 +937,11 @@ class MemberTest extends TestCase
         $this->assertDatabaseCount('boat_types', 2);
     }
 
-    public function test_create_supporter_and_send_pw_mail(): void
+    public function test_create_supporter_w_pw_reset(): void
     {
         $this->seed();
-        Mail::fake();
+        $this->actingAs(Admin::find(1), 'admin');
+        Notification::fake();
 
         $memberEmail = fake()->email();
         $this->post('api/member', [
@@ -946,10 +968,35 @@ class MemberTest extends TestCase
         ]);
         $this->assertDatabaseCount('contributions', 0);
 
-        Mail::assertSent(WelcomeMember::class, function (WelcomeMember $mail) use ($memberEmail) {
-            return
-                $mail->hasFrom('flobono@me.com') &&
-                $mail->hasTo($memberEmail);
-        });
+        Notification::assertSentTo([Member::find(1)], ResetPassword::class);
+    }
+
+    public function test_send_pw_reset(): void
+    {
+        $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
+        Notification::fake();
+
+        $memberEmail = fake()->email();
+        $this->post('api/member', [
+            'type' => 'supporter',
+            'member' => [
+                'email' => $memberEmail,
+                'first' => fake()->firstName(),
+                'last' => fake()->lastName(),
+                'birthdate' => fake()->date(),
+                'address' => fake()->word(),
+                'postal_code' => fake()->word(),
+                'city' => fake()->word(),
+                'phone' => fake()->word(),
+                'job' => fake()->word()
+            ],
+        ]);
+
+        $this->assertDatabaseCount('members', 1);
+
+        $this->get('api/member/1/welcome');
+
+        Notification::assertSentTo([Member::find(1)], ResetPassword::class);
     }
 }

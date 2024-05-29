@@ -7,6 +7,7 @@ use App\Models\BoatType;
 use App\Models\Homeport;
 use App\Models\Member;
 use App\Models\MemberType;
+use App\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -78,6 +79,8 @@ class AdhesionController extends Controller
     {
         $requestor->pending = false;
         $requestor->saveQuietly();
+
+        Utils::sendPasswordReset($requestor->email);
     }
 
     public function declineAdhesion(Member $requestor)

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -13,6 +14,7 @@ class HomepageTest extends TestCase
     public function test_patch_homepage(): void
     {
         $this->seed();
+        $this->actingAs(Admin::find(1), 'admin');
 
         $title = fake()->sentence();
         $json = json_encode([
