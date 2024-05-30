@@ -72,16 +72,11 @@ class MemberController extends Controller
 
         // boat
         if ($request->input('type') !== 'supporter') {
-            $boat = $member->boat()->createQuietly([
-                'name' => $request->input('boat.name'),
-                'brand' => $request->input('boat.brand'),
-                'model' => $request->input('boat.model'),
-                'year' => $request->input('boat.year'),
-                'length' => $request->input('boat.length'),
-                'width' => $request->input('boat.width'),
-                'boat_type_id' => BoatType::where('uid', $request->input('boat.type'))->pluck('id')->first(),
-                'homeport_id' => Homeport::where('uid', $request->input('boat.homeport'))->pluck('id')->first()
-            ]);
+            $boatData = array_intersect_key($request->input('boat'), array_flip(['name', 'brand', 'model', 'year', 'length', 'width']));
+            $boatData['boat_type_id'] = BoatType::where('uid', $request->input('boat.type'))->pluck('id')->first();
+            $boatData['homeport_id'] = Homeport::where('uid', $request->input('boat.homeport'))->pluck('id')->first();
+
+            $boat = $member->boat()->createQuietly($boatData);
 
             // coowner
             if ($request->filled('coowner')) {
@@ -109,32 +104,32 @@ class MemberController extends Controller
     public function update(Request $request, Member $member)
     {
         $request->validate([
-            'type' => 'string',
+            'type' => 'sometimes|required|string',
 
-            'member.email' => 'email',
-            'member.first' => 'string',
-            'member.last' => 'string',
-            'member.birthdate' => 'string',
-            'member.address' => 'string',
-            'member.postal_code' => 'string',
-            'member.city' => 'string',
-            'member.phone' => 'string',
-            'member.job' => 'string',
+            'member.email' => 'sometimes|required|email',
+            'member.first' => 'sometimes|required|string',
+            'member.last' => 'sometimes|required|string',
+            'member.birthdate' => 'sometimes|required|string',
+            'member.address' => 'sometimes|required|string',
+            'member.postal_code' => 'sometimes|required|string',
+            'member.city' => 'sometimes|required|string',
+            'member.phone' => 'sometimes|required|string',
+            'member.job' => 'sometimes|required|string',
 
-            'boat.name' => 'string',
-            'boat.brand' => 'string',
-            'boat.model' => 'string',
-            'boat.year' => 'date',
-            'boat.length' => 'decimal:0,2',
-            'boat.width' => 'decimal:0,2',
-            'boat.type' => 'string',
-            'boat.homeport' => 'string',
+            'boat.name' => 'sometimes|required|string',
+            'boat.brand' => 'sometimes|required|string',
+            'boat.model' => 'sometimes|required|string',
+            'boat.year' => 'sometimes|required|date',
+            'boat.length' => 'sometimes|required|decimal:0,2',
+            'boat.width' => 'sometimes|required|decimal:0,2',
+            'boat.type' => 'sometimes|required|string',
+            'boat.homeport' => 'sometimes|required|string',
 
-            'coowner.first' => 'string',
-            'coowner.last' => 'string',
-            'coowner.nationality' => 'string',
+            'coowner.first' => 'sometimes|required|string',
+            'coowner.last' => 'sometimes|required|string',
+            'coowner.nationality' => 'sometimes|required|string',
 
-            'contribution' => 'numeric|gt:0',
+            'contribution' => 'sometimes|required|numeric|gt:0',
         ]);
 
         // update member infos
@@ -153,7 +148,18 @@ class MemberController extends Controller
         if (!$member->member_types()->where('uid', '=', 'supporter')->exists()) {
             // update boat for != supporter
             if ($request->filled('boat')) {
-                $member->boat->updateQuietly($request->input('boat'));
+                $boatTypeId = BoatType::where('uid', $request->input('boat.type'))->pluck('id')->first();
+                $homeportId = Homeport::where('uid', $request->input('boat.homeport'))->pluck('id')->first();
+
+                $data = $request->input('boat');
+                if ($boatTypeId) {
+                    $data['boat_type_id'] = $boatTypeId;
+                }
+                if ($homeportId) {
+                    $data['homeport_id'] = $homeportId;
+                }
+
+                $member->boat->updateQuietly($data);
             }
 
             // update or create coowner

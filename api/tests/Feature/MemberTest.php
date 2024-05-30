@@ -5,10 +5,8 @@ namespace Tests\Feature;
 use App\Models\Admin;
 use App\Models\Member;
 use Illuminate\Auth\Notifications\ResetPassword;
-use Laravel\Sanctum\Sanctum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 

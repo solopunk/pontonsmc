@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Utils;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(Request $request, $for)
     {
+
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -19,12 +21,15 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::guard('admin')->attempt(
+        if (Auth::guard($for)->attempt(
             $credentials,
             $request->filled('remember')
         )) {
             $request->session()->regenerate();
-            return redirect()->intended('/api/t');
+            // redirect or ?
+            if ($for === 'member') {
+                return redirect()->intended(route('profil'));
+            }
         }
 
         return back()->withErrors([
@@ -32,13 +37,21 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request): RedirectResponse
+    public function logout(Request $request, $for): void
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('api/login');
+        // if ($for === 'member') {
+        //     return redirect('api/login');
+        // }
+    }
+
+    public function forgotPassword(Request $request): void
+    {
+        $request->validate(['email' => 'required|email']);
+        Utils::sendPasswordReset($request->input('email'));
     }
 }

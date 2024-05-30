@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
+// auth
+Route::post('login', [AuthController::class, 'login'])->middleware('guest')->defaults('for', 'admin');
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->defaults('for', 'admin');
+
+
 Route::middleware('auth:sanctum')->group(function () {
     // member
     Route::get('accept-adhesion/{requestor}', [AdhesionController::class, 'acceptAdhesion']);
@@ -38,9 +43,3 @@ Route::middleware('auth:sanctum')->group(function () {
     // homepage
     Route::patch('homepage', [HomepageController::class, 'update']);
 });
-
-Route::get('t', fn () => 'you are admin')->middleware('auth:admin');
-
-// auth
-Route::post('login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

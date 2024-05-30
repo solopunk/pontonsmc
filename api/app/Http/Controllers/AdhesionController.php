@@ -8,8 +8,12 @@ use App\Models\Homeport;
 use App\Models\Member;
 use App\Models\MemberType;
 use App\Utils;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class AdhesionController extends Controller
@@ -88,5 +92,31 @@ class AdhesionController extends Controller
         $requestor->deleteQuietly();
 
         Mail::to($requestor->email)->send(new DeclineRequestor());
+    }
+
+    public function submitPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::broker('members')->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (Member $member, string $password) {
+                $member->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $member->save();
+
+                event(new PasswordReset($member));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 }
