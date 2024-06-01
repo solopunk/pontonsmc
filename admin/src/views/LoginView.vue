@@ -1,8 +1,10 @@
 <script setup>
 import axios from "@/axios";
 import { reactive } from "vue";
-import { login } from "../../store";
-import router from "@/router";
+import { login, store } from "../../store";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const credentials = reactive({
   email: "",
@@ -17,8 +19,8 @@ const sendCredentials = async () => {
       password: credentials.password,
     });
 
-    login();
-    router.push({ name: "members" });
+    login(response.data.return.email);
+    router.push({ name: "scoops" });
   } catch (error) {
     console.error("Login failed", error);
   }

@@ -4,6 +4,6 @@ import Layout from "@/components/layouts/Layout.vue";
 
 <template>
   <Layout>
-    <p>member</p>
+    <p>courriels</p>
   </Layout>
 </template>
