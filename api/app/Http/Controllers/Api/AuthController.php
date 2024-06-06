@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ErrorResponseTrait;
 use App\Http\Controllers\Controller;
+use App\JsonResponseTrait;
 use App\Utils;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,9 +12,10 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    use JsonResponseTrait, ErrorResponseTrait;
+
     public function login(Request $request, $for)
     {
-
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -30,11 +33,11 @@ class AuthController extends Controller
             if ($for === 'member') {
                 return redirect()->intended(route('profil'));
             }
+
+            return $this->successResponse(Auth::guard('admin')->user(), 'Login successful');
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+        return $this->errorResponse('Invalid credentials', 401);
     }
 
     public function logout(Request $request, $for): void

@@ -1,5 +1,4 @@
 import { reactive } from "vue";
-import { useRouter } from "vue-router";
 
 const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
 
@@ -17,7 +16,4 @@ export function logout() {
   store.isAuthenticated = false;
   localStorage.removeItem("isAuthenticated");
   localStorage.removeItem("adminEmail");
-
-  const router = useRouter();
-  router.push({ name: "login" });
 }

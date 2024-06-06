@@ -1,3 +1,7 @@
+.editorjs * {
+    all: initial;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

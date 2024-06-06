@@ -86,7 +86,7 @@ class MailTest extends TestCase
         $resp = $this->post('api/mail', [
             'type' => 'new',
             'title' => $title,
-            'to' => ['latecommer'],
+            'to' => ['latecomer'],
         ]);
 
         $resp->assertInvalid(['to']);

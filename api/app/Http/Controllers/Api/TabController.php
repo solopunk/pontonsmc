@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ErrorResponseTrait;
 use App\Http\Controllers\Controller;
+use App\JsonResponseTrait;
 use App\Models\Tab;
 use Durlecode\EJSParser\Parser;
 use Illuminate\Http\Request;
 
 class TabController extends Controller
 {
+    use JsonResponseTrait, ErrorResponseTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -55,7 +59,11 @@ class TabController extends Controller
             }
 
             $tab->saveQuietly();
+
+            return $this->successResponse($tab);
         }
+
+        return $this->errorResponse();
     }
 
     /**

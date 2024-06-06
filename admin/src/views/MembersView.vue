@@ -1,24 +1,51 @@
 <script setup>
 import Layout from "@/components/layouts/Layout.vue";
+import { ref, watch, onMounted } from "vue";
+import axios from "axios";
 import {
   BarsArrowUpIcon,
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/vue/20/solid";
 
-const people = [
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
-    role: "Member",
-  },
-  // More people...
-];
+const loading = ref(true);
+const members = ref([]);
+const page = ref(1);
+const hasMorePages = ref(false);
+
+const fetchMembers = async () => {
+  try {
+    const response = await axios.get("/api/member", {
+      params: { page: page.value },
+    });
+    members.value = response.data.data;
+    hasMorePages.value = response.data.current_page < response.data.last_page;
+  } catch (error) {
+    console.error("Error fetching members:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// // Functions to navigate between pages
+// const nextPage = () => {
+//   if (hasMorePages.value) {
+//     page.value += 1;
+//   }
+// };
+
+// const previousPage = () => {
+//   if (page.value > 1) {
+//     page.value -= 1;
+//   }
+// };
+
+watch(page, fetchMembers);
+onMounted(fetchMembers);
 </script>
 
 <template>
-  <Layout>
+  <Layout :loading>
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
         <h1 class="text-base font-semibold leading-6 text-gray-900">Users</h1>
@@ -46,87 +73,56 @@ const people = [
                   scope="col"
                   class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                 >
-                  <a href="#" class="group inline-flex">
-                    Name
-                    <span
-                      class="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
-                    >
-                      <ChevronDownIcon class="h-5 w-5" aria-hidden="true" />
-                    </span>
-                  </a>
+                  Nom
                 </th>
                 <th
                   scope="col"
                   class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
-                  <a href="#" class="group inline-flex">
-                    Title
-                    <span
-                      class="ml-2 flex-none rounded bg-gray-100 text-gray-900 group-hover:bg-gray-200"
-                    >
-                      <ChevronDownIcon class="h-5 w-5" aria-hidden="true" />
-                    </span>
-                  </a>
+                  Courriel
                 </th>
                 <th
                   scope="col"
                   class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
-                  <a href="#" class="group inline-flex">
-                    Email
-                    <span
-                      class="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
-                    >
-                      <ChevronDownIcon
-                        class="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </a>
+                  Type
                 </th>
                 <th
                   scope="col"
                   class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
-                  <a href="#" class="group inline-flex">
-                    Role
-                    <span
-                      class="invisible ml-2 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
-                    >
-                      <ChevronDownIcon
-                        class="invisible ml-2 h-5 w-5 flex-none rounded text-gray-400 group-hover:visible group-focus:visible"
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </a>
+                  À jour de cotisation
                 </th>
-                <th scope="col" class="relative py-3.5 pl-3 pr-0">
+                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
                   <span class="sr-only">Edit</span>
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="person in people" :key="person.email">
+            <tbody class="divide-y divide-gray-200">
+              <tr v-for="member in members" :key="member.email">
                 <td
                   class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"
                 >
-                  {{ person.name }}
+                  {{ member.first + " " + member.last }}
                 </td>
                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.title }}
+                  {{ member.email }}
                 </td>
                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.email }}
+                  {{ member.type }}
                 </td>
                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.role }}
+                  {{ member.upToDate }}
                 </td>
                 <td
-                  class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0"
+                  class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
                 >
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                    >Edit<span class="sr-only">, {{ person.name }}</span></a
+                  <RouterLink
+                    class="text-indigo-600 hover:text-indigo-900"
+                    :to="{ name: 'member', params: { id: member.id } }"
                   >
+                    Edit<span class="sr-only">, {{ member.name }}</span>
+                  </RouterLink>
                 </td>
               </tr>
             </tbody>

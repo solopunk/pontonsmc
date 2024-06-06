@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'Retardataire',
-                'uid' => 'latecommer'
+                'uid' => 'latecomer'
             ],
         ] as $type) {
             MemberType::create([
@@ -180,5 +180,7 @@ class DatabaseSeeder extends Seeder
             'intro_json' => $introJson,
             'intro_html' => $introHtml,
         ]);
+
+        $this->call(DataTestSeeder::class);
     }
 }

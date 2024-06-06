@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ErrorResponseTrait;
 use App\Http\Controllers\Controller;
+use App\JsonResponseTrait;
 use App\Models\Scoop;
 use Durlecode\EJSParser\Parser;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ScoopController extends Controller
 {
+    use JsonResponseTrait, ErrorResponseTrait;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $scoops = Scoop::paginate(10);
+        return response()->json($scoops, 200);
     }
 
     /**
@@ -62,7 +68,11 @@ class ScoopController extends Controller
      */
     public function show(Scoop $scoop)
     {
-        //
+        $scoop->content = $scoop->content_json;
+
+        $scoop->makeHidden(['created_at', 'updated_at', 'content_html', 'content_json']);
+
+        return response()->json($scoop, 200);
     }
 
     /**
@@ -70,41 +80,52 @@ class ScoopController extends Controller
      */
     public function update(Request $request, Scoop $scoop)
     {
-        if (boolval(count($request->all()))) {
-            $request->validate([
-                'title' => 'sometimes|required|string',
-                'content' => 'json',
+        try {
 
-                'cover' => 'image',
-                'attachments' => 'array',
-                'attachments.*' => 'file',
-            ]);
+            if (boolval(count($request->all()))) {
+                $request->validate([
+                    'title' => 'sometimes|required|string',
+                    'content' => 'json',
 
-            if ($request->filled('title')) {
-                $scoop->title = $request->input('title');
-            }
+                    'cover' => 'image',
+                    'attachments' => 'array',
+                    'attachments.*' => 'file',
+                ]);
 
-            if ($request->filled('content')) {
-                $html = Parser::parse($request->input('content'))->toHtml();
-                $scoop->content_json = $request->input('content');
-                $scoop->content_html = $html;
-            }
+                if ($request->filled('title')) {
+                    $scoop->title = $request->input('title');
+                }
 
-            $scoop->saveQuietly();
+                if ($request->filled('content')) {
+                    $html = Parser::parse($request->input('content'))->toHtml();
+                    $scoop->content_json = $request->input('content');
+                    $scoop->content_html = $html;
+                }
 
-            if ($request->hasFile('cover')) {
-                $scoop
-                    ->addMediaFromRequest('cover')
-                    ->toMediaCollection('covers');
-            }
+                $scoop->saveQuietly();
 
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $attachment) {
+                if ($request->hasFile('cover')) {
                     $scoop
-                        ->addMedia($attachment)
-                        ->toMediaCollection('attachments');
+                        ->addMediaFromRequest('cover')
+                        ->toMediaCollection('covers');
+                }
+
+                if ($request->hasFile('attachments')) {
+                    foreach ($request->file('attachments') as $attachment) {
+                        $scoop
+                            ->addMedia($attachment)
+                            ->toMediaCollection('attachments');
+                    }
                 }
             }
+            redirect()->route('scoop.show', $scoop->id);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return $this->errorResponse('', 500, $e);
         }
     }
 

@@ -7,6 +7,7 @@ import LoginView from "@/views/LoginView.vue";
 import AddMemberView from "@/views/add/AddMemberView.vue";
 import ScoopsView from "@/views/ScoopsView.vue";
 import MailsView from "@/views/MailsView.vue";
+import ScoopView from "@/views/ScoopView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,14 @@ const router = createRouter({
       component: ScoopsView,
       meta: {
         title: "Actualités",
+      },
+    },
+    {
+      path: "/scoops/:id",
+      name: "scoop",
+      component: ScoopView,
+      meta: {
+        title: "Actualité",
       },
     },
     {
